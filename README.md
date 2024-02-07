@@ -73,7 +73,17 @@ The content will be exactly the same as below,
 
     sudo chmod 600 mysql.cnf
 
-**5.** Locate autoVoLTE.sh file in /home/<user> directory. Open this file using any text editor and edit the value of variable “HomeDirectory” occurs in #line 6 according to your home directory. Also edit #line 974 “source /home/vagrant/.env” according to the directory of your .env file.
+**5.** Locate autoVoLTE_Local.sh (*for local deployment*) or autoVoLTE_GCP.sh (*for GCP deployment*) file in /home/<user> directory. Open this file using any text editor and edit the value of variable “HomeDirectory” occurs in #line 6 according to your home directory. Also edit #line 974 in autoVoLTE_Local.sh (*for local deployment*) or #line 977 in autoVoLTE_GCP.sh (*for GCP deployment*)  “source /home/vagrant/.env” according to the directory of your .env file.
+
+**6.** GCP DNS Binding (*Only for GCP deployment, not required for local deployment*)
+
+Firstly, edit /etc/hosts file. In /etc/hosts file, we need to add the GCP instance name with a loopback IP 127.0.1.1. This instance name and IP pair should be just below the IP-localhost pair.
+
+![image](https://github.com/AshiqRashid/AutomationScritp_for_Open5GS_and_Kamailio_Installation-Configuration/assets/136219283/68e4118a-b8b1-495a-b99f-543390fc44be)
+
+Here, the second line is the instance name and loopback IP pair.
+
+Secondly,
 
 **6.** Now provide permission and run the script.
 
