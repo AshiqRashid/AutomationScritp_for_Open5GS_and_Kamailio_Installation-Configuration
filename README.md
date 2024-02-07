@@ -1,11 +1,11 @@
 # AutomationScritp_for_Open5GS_and_Kamailio_Installation-Configuration
 
-For establishig a private EPC that supports VoLTE, we need EPC and IMS both. Open5GS is an opensource EPC which is widely used for private EPC and 5G core. We deploy this core along with Kamailio which is an open source SIP Server that provides IMS functionalities. Besides Open5GS and Kamailio, we need some more modules and packages namely RTPProxy, RTPEngine and FHoSS.
+For establishig a private EPC that supports VoLTE, we need EPC and IMS both. Open5GS is an opensource EPC which is widely used for private EPC and 5G core. We deploy this core and integrate it with Kamailio which is an open source SIP Server that provides IMS functionalities. Besides Open5GS and Kamailio, we also need some more modules and packages namely RTPProxy, RTPEngine and FHoSS.
 
 Installation of Open5gs, Kamailio, RTPProxy, RTPEngine and FHoSS takes a handful of commands to be run manually. Moreover, a lot of files are generated during these installations which need to be configured as well. This process is lengthy and takes a lot of time. At the same time, it is a complicated process, as any unconscious error may lead to a fatal consequence and the programs may not work properly. So, a shell script has been developed that will automatically do all these manual installations and configurations.
 
 # INSTRUCTION
-Follow the steps below,
+Follow the below steps. There are some differences between deployment in local machine/VM and GCP which are indicated below.
 
 **1.** Make a .env file in /home/<user> location.
 
@@ -13,7 +13,19 @@ Follow the steps below,
 
 The content will be as like below as per your specification
 
+*For local machine or VM*
+
     MACHINE_IP="192.168.0.252"
+    M_C_C="001"
+    M_N_C="01"
+    T_A_C="1"
+    IMS_DOMAIN_NAME="ims.mnc001.mcc001.3gppnetwork.org"
+    EPC_DOMAIN_NAME="epc.mnc001.mcc001.3gppnetwork.org"
+
+*For GCP*
+
+    MACHINE_IP="192.168.0.252"
+    EXTERNAL_IP="34.148.71.35"
     M_C_C="001"
     M_N_C="01"
     T_A_C="1"
