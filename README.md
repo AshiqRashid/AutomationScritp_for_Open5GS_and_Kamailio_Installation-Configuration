@@ -5,7 +5,8 @@ For establishig a private EPC that supports VoLTE, we need EPC and IMS both. Ope
 Installation of Open5gs, Kamailio, RTPProxy, RTPEngine and FHoSS takes a handful of commands to be run manually. Moreover, a lot of files are generated during these installations which need to be configured as well. This process is lengthy and takes a lot of time. At the same time, it is a complicated process, as any unconscious error may lead to a fatal consequence and the programs may not work properly. So, a shell script has been developed that will automatically do all these manual installations and configurations.
 
 # INSTRUCTION
-Follow the steps below
+Follow the steps below,
+
 **1.** Make a .env file in /home/<user> location.
 
     nano .env
@@ -59,5 +60,72 @@ The content will be exactly the same as below,
 **4.** As mysql.cnf is created, run the below command in the same directory for permission.
 
     sudo chmod 600 mysql.cnf
+
+**5.** Locate autoVoLTE.sh file in /home/<user> directory. Open this file using any text editor and edit the value of variable “HomeDirectory” occurs in #line 6 according to your home directory. Also edit #line 974 “source /home/vagrant/.env” according to the directory of your .env file.
+
+**6.** Now provide permission and run the script.
+
+    sudo chmod +x autoVoLTE.sh
+    sudo ./autoVoLTE.sh
+
+It takes time to complete the program.
+
+# Re-running autoVoLTE.sh:
+If the script autoVoLTE.sh gets stopped meanwhile during running, you can easily re-run it. Before that check the status of Kamailio and RTPProxy. If you find these are installed and masked, then unmask and enable them first.
+
+    sudo systemctl unmask kamailio.service
+    sudo systemctl enable kamailio.service
+    sudo systemctl start kamailio.service
+    sudo systemctl unmask rtpproxy.service
+    sudo systemctl enable rtpproxy.service
+    sudo systemctl start rtpproxy.service
+
+# Check:
+
+After successful running of the program, check these few steps to ensure everything has been installed and configured successfully.
+
+**1.** Check status of Open5gs. You may see some errors. In that case just restart Open5gs and check status once again.
+
+    bash /etc/open5gs/shortcut.sh restart
+    bash /etc/open5gs/shortcut.sh status
+
+**2.** Check the status of MongoDB and RTPEngine as well.
+
+**3.** Check Databases with their tables. There will be databases for Kamailio, PCSCF, SCSCF, ICSCF and IMS (hss_db). hss_db is already poplulated with two sample subscribers. Check for their existence.
+
+    sudo mysql;
+    show databases;
+    use <database_name>;
+    show tables;
+    select * from <table_name>
+
+**4.** PING PCSCF, SCSCF and ICSCF to test DNS resolving.
+
+# Start VoLTE:
+
+When the script has run successfully and we have checked that everything has been installed and configured, then we can start VoLTE. Follow these steps for starting VoLTE.
+
+**1.** Open four new terminals for PCSCF, SCSCF, ICSCF and FHoSS. Then sudo su each of them.
+
+**2.** Run PCSCF: 
+
+    mkdir -p /var/run/kamailio_pcscf
+    kamailio -f /etc/kamailio_pcscf/kamailio_pcscf.cfg -P /kamailio_pcscf.pid -DD -E -e
+
+**3.** Run SCSCF: 
+
+    mkdir -p /var/run/kamailio_scscf
+    kamailio -f /etc/kamailio_scscf/kamailio_scscf.cfg -P /kamailio_scscf.pid -DD -E -e
+
+**4.** Run ICSCF:
+
+    mkdir -p /var/run/kamailio_icscf
+    kamailio -f /etc/kamailio_icscf/kamailio_icscf.cfg -P /kamailio_icscf.pid -DD -E -e
+
+**5.** Run FHoSS:
+
+    cd ~
+    ./hss.sh
+
 
     
