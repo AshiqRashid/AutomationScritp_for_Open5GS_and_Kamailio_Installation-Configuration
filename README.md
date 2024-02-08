@@ -83,12 +83,31 @@ Firstly, edit /etc/hosts file. In /etc/hosts file, we need to add the GCP instan
 
 Here, the second line is the instance name and loopback IP pair.
 
-Secondly,
+Secondly, run autoBIND_GCP.sh to solve the binding issues. (Use sudo, don’t use sudo su)
 
-**6.** Now provide permission and run the script.
+    sudo chmod +x autoBIND_GCP.sh
+    sudo ./autoBIND_GCP.sh
 
-    sudo chmod +x autoVoLTE.sh
-    sudo ./autoVoLTE.sh
+Check /etc/resolv.conf and /etc/netplan/50-cloud-init.yaml, these should look as like below, respectively.
+
+![image](https://github.com/AshiqRashid/AutomationScritp_for_Open5GS_and_Kamailio_Installation-Configuration/assets/136219283/593e4dfd-ef94-4b85-a1ec-ed2ee00d04ba)
+
+![image](https://github.com/AshiqRashid/AutomationScritp_for_Open5GS_and_Kamailio_Installation-Configuration/assets/136219283/d32e47a2-0eb0-4388-8256-e9557d3e90da)
+
+Now, our system is ready for running the main program. Follow the below steps,
+
+**7.** Now provide permission and run the script.
+
+*For local machine or VM*
+
+    sudo chmod +x autoVoLTE_Local.sh
+    sudo ./autoVoLTE_Local.sh
+
+*For GCP instance*
+
+    sudo chmod +x autoVoLTE_GCP.sh
+    sudo ./autoVoLTE_GCP.sh
+
 
 It takes time to complete the program.
 
@@ -149,5 +168,36 @@ When the script has run successfully and we have checked that everything has bee
     cd ~
     ./hss.sh
 
+# After Rebooting
 
+When you have everything installed and configured, and you reboot the system, then follow the below steps for restoring VoLTE after rebooting.
+
+**1.** First check whether you can ping pcscf, scscf and icscf. In GCP instance, if you cannot do it, run the below script.
+
+    sudo ./autoBIND_GCP.sh
+
+Hopefully, you can ping those components of IMS now.
+
+**2.** Run these below commands 
+
+    sudo sysctl -w net.ipv4.ip_forward=1
+    sudo sysctl -w net.ipv6.conf.all.forwarding=1
+    sudo iptables -t nat -A POSTROUTING -s 10.45.0.0/16 ! -o ogstun -j MASQUERADE
+    sudo ip6tables -t nat -A POSTROUTING -s 2001:db8:cafe::/48 ! -o ogstun -j MASQUERADE
+
+    sudo ip tuntap add name ogstun2 mode tun
+    sudo ip addr add 10.46.0.1/16 dev ogstun2
+    sudo ip addr add 2001:db8:cafe::1/48 dev ogstun2
+    sudo ip link set ogstun2 up
+
+    sudo sysctl -w net.ipv4.ip_forward=1
+    sudo sysctl -w net.ipv6.conf.all.forwarding=1
+    sudo iptables -t nat -A POSTROUTING -s 10.46.0.0/16 ! -o ogstun2 -j MASQUERADE
+
+    sudo ip6tables -t nat -A POSTROUTING -s 2001:db8:cafe::/48 ! -o ogstun2 -j MASQUERADE
+
+**3.** Now, restart Open5gs.
+    bash /etc/open5gs/shortcut.sh restart
+
+**4.** For restoring VoLTE, follow the previous section entitled as **"Start VoLTE"**.
     
